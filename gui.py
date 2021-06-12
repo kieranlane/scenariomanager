@@ -2,8 +2,11 @@
 import PySimpleGUI as sg
 import pandas as pd
 import addresses as ad
+import os
 
-df = pd.read_csv('C:\\Users\\Kieran\\Python\\Work\\ScenarioManager\\test.csv', sep=',', engine='python', header=None)
+cwd = os.getcwd()
+file = '\\test.csv'
+df = pd.read_csv(cwd + file, sep=',', engine='python', header=None)
 header_list = df.iloc[0].tolist()
 data = df[1:].values.tolist()
 column_lengths = [6, 30]
