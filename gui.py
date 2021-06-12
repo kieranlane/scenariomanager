@@ -2,40 +2,29 @@
 import PySimpleGUI as sg
 import pandas as pd
 import addresses as ad
-import os
-
-cwd = os.getcwd()
-file = '\\test.csv'
-df = pd.read_csv(cwd + file, sep=',', engine='python', header=None)
-header_list = df.iloc[0].tolist()
-data = df[1:].values.tolist()
-column_lengths = [6, 30]
-button_name = "Load"
-address = pd.DataFrame.from_dict({'DC': list(ad.gsm_dict().keys()), 'GSM': list(ad.gsm_dict().values())})
-address_list = address.values.tolist()
-address_headers = ['DC', 'GSM']
+import config as cfg
 
 sg.ChangeLookAndFeel('DarkGrey13')
 
 # ------ Menu Definition ------ #      
-menu_def = [['File', ['Open', 'Save', 'Exit', 'Properties']],      
-            ['Edit', ['Paste', ['Special', 'Normal', ], 'Undo'], ],      
-            ['Help', 'About...'], ]      
-
-# ------ Column Definition ------ #      
-column1 = [[sg.Text('Column 1', background_color='#F7F3EC', justification='center', size=(10, 1))],      
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 1')],      
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 2')],      
-            [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]]      
+menu_def = [
+    ['File', ['Open', 'Save', 'Exit', 'Properties']],
+    ['Help', 'About']
+]
 
 layout = [      
 
-    [sg.Menu(menu_def, tearoff=True)],
+    # [sg.Menu(menu_def, tearoff=False)],
 
     [sg.Frame('', layout=[
 
-        [sg.Text('Scenario Manager SE Tools', size=(60, 1), justification='center', font=("Helvetica", 25))],
+        [
+            sg.Text('     Scenario Manager SE Tools', size=(55, 1), justification='center', font=("Helvetica", 25)),
+            sg.Button(image_filename=cfg.get_files('theme'), image_size=(30, 30), image_subsample=40, button_color=None, key='theme')
+        ],
+
         [sg.Text('', size=(16, 2), justification='center')],
+
         [
             sg.Frame(layout=[
                 [sg.Text('Username', size=(8, 1)), sg.InputText('*@centurylink.com', size=(18, 1))],
@@ -54,16 +43,28 @@ layout = [
                 [sg.Button(button_text='Load', size=(30, 1))]
             ], title='Quote Details', element_justification='center', title_location=sg.TITLE_LOCATION_TOP, font=('', 15))
         ],
+
         [sg.Text('', size=(16, 2), justification='center')],
+
         [
             sg.Frame('Add Addresses', layout=[
-                [sg.Table(values=address_list,
-                          headings=address_headers,
-                          display_row_numbers=False,
-                          auto_size_columns=False,
-                          justification='center',
-                          col_widths=column_lengths,
-                          num_rows=min(25, len(data)))
+
+                [
+                    sg.Text('Filter', size=(6, 1), auto_size_text=True, justification='left'),
+                    sg.InputText('LO', size=(20, 1)), sg.Button(button_text='Search'), sg.Button(button_text='Reset')
+                ],
+
+                [
+                    sg.Table(
+                        values=cfg.get_addresses('value'),
+                        headings=cfg.get_addresses('header'),
+                        display_row_numbers=False,
+                        auto_size_columns=False,
+                        justification='center',
+                        col_widths=cfg.get_addresses('column'),
+                        num_rows=cfg.get_addresses('length')
+                        # min(25, len(cfg.get_addresses('value')))
+                    )
                  ],
 
                 [sg.Button(button_text='Add', size=(25, 1))]
@@ -76,13 +77,17 @@ layout = [
                     sg.InputText('S123456', size=(20, 1)), sg.Button(button_text='Search')
                 ],
 
-                [sg.Table(values=data,
-                          headings=header_list,
-                          display_row_numbers=False,
-                          auto_size_columns=False,
-                          justification='center',
-                          col_widths=column_lengths,
-                          num_rows=min(25, len(data)))
+                [
+                    sg.Table(
+                        values=cfg.get_aip('value'),
+                        headings=cfg.get_aip('header'),
+                        display_row_numbers=False,
+                        auto_size_columns=False,
+                        justification='center',
+                        col_widths=cfg.get_aip('column'),
+                        num_rows=cfg.get_aip('length')
+                        # min(25, len(cfg.get_aip('value')))
+                    )
                  ],
 
                 [sg.Button(button_text='Import', size=(25, 1))]
@@ -90,7 +95,27 @@ layout = [
             ], element_justification='center', title_location=sg.TITLE_LOCATION_TOP, font=('', 15)),
 
             sg.Frame('Bulk Add SPCR ID', layout=[
-                [sg.Listbox(values=('Listbox 1', 'Listbox 2', 'Listbox 3'), size=(50, 10))]
+
+                [sg.Button(button_text='Load Quote', size=(25, 1))],
+
+                [
+                    sg.Table(
+                        values=cfg.get_spcr('value'),
+                        headings=cfg.get_spcr('header'),
+                        display_row_numbers=False,
+                        auto_size_columns=False,
+                        justification='center',
+                        col_widths=cfg.get_spcr('column'),
+                        num_rows=cfg.get_spcr('length')
+                        # min(25, len(cfg.get_aip('value')))
+                    )
+                ],
+
+                [
+                    sg.Text('SPCR #', size=(6, 1), auto_size_text=True, justification='left'),
+                    sg.InputText('DSR123456', size=(20, 1)), sg.Button(button_text='Add SPCR')
+                ]
+
             ], element_justification='center', title_location=sg.TITLE_LOCATION_TOP, font=('', 15))
         ],
 
@@ -107,16 +132,6 @@ layout = [
 
 window = sg.Window('Scenario Manager Tools', layout, default_element_size=(40, 1), grab_anywhere=False)
 
-while True:
-    event, values = window.read()
-    if event == sg.WIN_CLOSED or event=="Exit":
-        break
-    elif values["-IN-"] == True:
-        button_name = "Load & Approve"
+event, values = window.read()
 
-window.close()    
-
-sg.popup('Title',      
-            'The results of the window.',      
-            'The button clicked was "{}"'.format(event),      
-            'The values are', values)
+window.close()
