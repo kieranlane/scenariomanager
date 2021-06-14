@@ -15,6 +15,12 @@ def get_files(filetype):
     elif filetype == 'spcr':
         return cwd + '\\spcr.csv'
 
+    elif filetype == 'profile':
+        return cwd + '\\profile.png'
+
+    elif filetype == 'settings':
+        return cwd + '\\settings.png'
+
     else:
         print('Config.py - get_files, no matching "filetype"')
         return 'ERROR'

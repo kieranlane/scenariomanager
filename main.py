@@ -5,8 +5,9 @@
 # 1.0   Initial script creation
 
 # Imports
-import addresses as gsm
+import addresses as ad
 import webauto as wa
+import gui
 
 # Notes:
 #   Add required addresses to quote
@@ -21,7 +22,11 @@ alt_dir = 'C:\\Users\\Kieran\\Python\\Work\\Test'
 sf_username = ''
 sf_password = ''
 sf_key = ''
+sf_opp = ''
 sm_quote = ''
 sm_spcr = ''
+se_approve = ''
 aip_ban = ''
 
+gui.start_interface()
+ad.gsm_dict()
