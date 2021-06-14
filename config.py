@@ -1,5 +1,6 @@
 import pandas as pd
 import addresses as ad
+import webauto as web
 import os
 import json
 
@@ -20,8 +21,10 @@ def config_create(path):
 
 def config_file(config='path', mode='read', value=''):
 
+    divider = web.what_am_i('divider')
+
     cwd = os.getcwd()
-    path = cwd + '\\config.cfg'
+    path = cwd + divider + 'cfg' + divider + 'config.cfg'
 
     # If no configuration file, create one
     if not os.path.exists(path):
@@ -60,22 +63,24 @@ def config_file(config='path', mode='read', value=''):
 
 
 def get_files(filetype):
+
+    divider = web.what_am_i('divider')
     cwd = os.getcwd()
 
     if filetype == 'theme':
-        return cwd + '\\theme.png'
+        return cwd + divider + 'img' + divider + 'theme.png'
 
     elif filetype == 'aip':
-        return cwd + '\\aip.csv'
+        return cwd + divider + 'csv' + divider + 'aip.csv'
 
     elif filetype == 'spcr':
-        return cwd + '\\spcr.csv'
+        return cwd + divider + 'csv' + divider + 'spcr.csv'
 
     elif filetype == 'profile':
-        return cwd + '\\profile.png'
+        return cwd + divider + 'img' + divider + 'profile.png'
 
     elif filetype == 'settings':
-        return cwd + '\\settings.png'
+        return cwd + divider + 'img' + divider + 'settings.png'
 
     else:
         print('Config.py - get_files, no matching "filetype"')

@@ -56,19 +56,19 @@ double_filter = False
 
 sg.ChangeLookAndFeel('DarkGrey13')
 
-menu_def = [
-    ['File', ['Open', 'Save', 'Exit', 'Properties']],
-    ['Help', 'About']
-]
+# menu_def = [
+    # ['File', ['Open', 'Save', 'Exit', 'Properties']],
+    # ['Help', 'About']
+# ]
 layout = [
 
     # UI Menu
-    [
-        sg.Menu(
-            menu_def,
-            tearoff=False
-        )
-    ],
+    # [
+    #     sg.Menu(
+    #         menu_def,
+    #         tearoff=False
+    #     )
+    # ],
 
     # UI Elements
     [

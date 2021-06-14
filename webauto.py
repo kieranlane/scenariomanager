@@ -10,6 +10,10 @@
 #       wa.latest_download()
 #       wa.latest_download(alt_dir)
 
+# Mac Changes
+# Replace https with http
+# Change backslashes
+
 # SCRIPT START
 import os
 import requests
@@ -19,15 +23,18 @@ from sys import platform
 import shutil
 
 # Web Driver URL/File Parts
-url_base = 'https://chromedriver.storage.googleapis.com/'
 url_release = 'LATEST_RELEASE'
 
 if platform == 'darwin':
+    url_base = 'http://chromedriver.storage.googleapis.com/'
     iam = 'darwin (Mac OS X)'
     file_name = 'chromedriver_mac64.zip'
+    divider = '/'
 elif platform == 'win32':
+    url_base = 'https://chromedriver.storage.googleapis.com/'
     iam = 'win32 (Windows)'
     file_name = 'chromedriver_win32.zip'
+    divider = '\\'
 
 file_dir = 'driver'
 
@@ -43,7 +50,7 @@ def driver_unzip(file, directory):
     # Inherits default directory from latest_download()
     # Removes remaining *.zip file
     with ZipFile(file, 'r') as zipObj:
-        zipObj.extractall(directory + '\\' + file_dir)
+        zipObj.extractall(directory + divider + file_dir)
     os.remove(file)
 
 
@@ -58,19 +65,22 @@ def latest_download(directory=os.getcwd()):
         os.makedirs(directory)
 
     # Check if /driver folder already exists, if so, delete it
-    if os.path.exists(directory + '\\' + file_dir):
-        shutil.rmtree(directory + '\\' + file_dir)
+    if os.path.exists(directory + divider + file_dir):
+        shutil.rmtree(directory + divider + file_dir)
 
-    wget.download(url_download, out=directory)
-    driver_unzip(directory + '\\' + file_name, directory)
+    wget.download(url_download, out=directory, bar=False)
+    driver_unzip(directory + divider + file_name, directory)
 
 
 def driver_setup(directory=os.getcwd()):
-    if os.path.exists(directory + '\\' + file_dir):
+    if os.path.exists(directory + divider + file_dir):
         return True
     else:
         return False
 
 
-def what_am_i():
-    return iam
+def what_am_i(returntype='fullos'):
+    if returntype == 'fullos':
+        return iam
+    if returntype == 'divider':
+        return divider
