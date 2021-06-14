@@ -1,18 +1,80 @@
+#!/usr/bin/env python
 import PySimpleGUI as sg
+import random
+import string
 
-layout = [[sg.T("")], [sg.T("        "), sg.Button('Hello World', size=(20, 4))], [sg.T("")],
-          [sg.T("                   "), sg.Checkbox('Print On:', default=True, key="-IN-")]]
+"""
+    Basic use of the Table Element
+"""
 
-###Setting Window
-window = sg.Window('Push my Buttons', layout, size=(300, 200))
+sg.theme('Dark Blue')
 
-###Showing the Application, also GUI functions can be placed here.
+# ------ Some functions to help generate data for the table ------
+def word():
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+def number(max_val=1000):
+    return random.randint(0, max_val)
 
+def make_table(num_rows, num_cols):
+    data = [[j for j in range(num_cols)] for i in range(num_rows)]
+    data[0] = [word() for __ in range(num_cols)]
+    for i in range(1, num_rows):
+        data[i] = [word(), *[number() for i in range(num_cols - 1)]]
+    return data
+
+# ------ Make the Table Data ------
+data = make_table(num_rows=15, num_cols=6)
+headings = [str(data[0][x])+'     ..' for x in range(len(data[0]))]
+
+# ------ Window Layout ------
+layout = [[sg.Table(values=data[1:][:], headings=headings, max_col_width=25,
+                    # background_color='light blue',
+                    auto_size_columns=True,
+                    display_row_numbers=True,
+                    justification='right',
+                    num_rows=15,
+                    alternating_row_color='#000020',
+                    select_mode=sg.TABLE_SELECT_MODE_EXTENDED,
+                    enable_events=True,
+                    key='-TABLE-',
+                    row_height=35,
+                    tooltip='This is a table')],
+          [sg.Button('Read'), sg.Button('Double'), sg.Button('Change Colors')],
+          [sg.Text('Read = read which rows are selected')],
+          [sg.Text('Double = double the amount of data in the table')],
+          [sg.Text('Change Colors = Changes the colors of rows 8 and 9')]]
+
+# ------ Create Window ------
+window = sg.Window('The Table Element', layout, finalize=True,
+                   # font='Helvetica 25',
+                   )
+table = window['-TABLE-']
+# ------ Event Loop ------
+
+user_click = True
+selected = []
 while True:
     event, values = window.read()
-    if event == sg.WIN_CLOSED or event == "Exit":
+    print(event, values)
+    if event == sg.WIN_CLOSED:
         break
-    elif values["-IN-"] == True:
-        print("Hello World")
+    if event == 'Double':
+        for i in range(len(data)):
+            data.append(data[i])
+        window['-TABLE-'].update(values=data)
+    elif event == 'Change Colors':
+        window['-TABLE-'].update(row_colors=((8, 'white', 'red'), (9, 'green')))
+    elif event == '-TABLE-':
+        if user_click:
+            if len(values['-TABLE-']) == 1:
+                select = values['-TABLE-'][0]
+                if select in selected:
+                    selected.remove(select)
+                else:
+                    selected.append(select)
+                table.update(select_rows=selected)
+                user_click = False
+        else:
+            user_click = True
 
 window.close()

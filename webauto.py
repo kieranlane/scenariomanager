@@ -15,11 +15,20 @@ import os
 import requests
 import wget
 from zipfile import ZipFile
+from sys import platform
+import shutil
 
 # Web Driver URL/File Parts
 url_base = 'https://chromedriver.storage.googleapis.com/'
 url_release = 'LATEST_RELEASE'
-file_name = 'chromedriver_win32.zip'
+
+if platform == 'darwin':
+    iam = 'darwin (Mac OS X)'
+    file_name = 'chromedriver_mac64.zip'
+elif platform == 'win32':
+    iam = 'win32 (Windows)'
+    file_name = 'chromedriver_win32.zip'
+
 file_dir = 'driver'
 
 
@@ -43,7 +52,25 @@ def latest_download(directory=os.getcwd()):
     # Confirms download directory exists and initiates download
     # Downloaded file unzipped using driver_unzip()
     url_download = url_base + latest_driver() + '/' + file_name
+
+    # Check if supplied directory exists
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+    # Check if /driver folder already exists, if so, delete it
+    if os.path.exists(directory + '\\' + file_dir):
+        shutil.rmtree(directory + '\\' + file_dir)
+
     wget.download(url_download, out=directory)
     driver_unzip(directory + '\\' + file_name, directory)
+
+
+def driver_setup(directory=os.getcwd()):
+    if os.path.exists(directory + '\\' + file_dir):
+        return True
+    else:
+        return False
+
+
+def what_am_i():
+    return iam
