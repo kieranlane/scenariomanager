@@ -29,14 +29,17 @@ if platform == 'darwin':
     url_base = 'http://chromedriver.storage.googleapis.com/'
     iam = 'darwin (Mac OS X)'
     file_name = 'chromedriver_mac64.zip'
+    plain_name = 'chromedriver'
     divider = '/'
 elif platform == 'win32':
     url_base = 'https://chromedriver.storage.googleapis.com/'
     iam = 'win32 (Windows)'
     file_name = 'chromedriver_win32.zip'
+    plain_name = 'chromedriver.exe'
     divider = '\\'
 
 file_dir = 'driver'
+down_dir = 'download'
 
 
 def latest_driver():
@@ -72,7 +75,15 @@ def latest_download(directory=os.getcwd()):
     driver_unzip(directory + divider + file_name, directory)
 
 
-def driver_setup(directory=os.getcwd()):
+def driver_setup(directory=os.getcwd(), mode=''):
+    if mode == 'path':
+        return directory + divider + file_dir + divider + plain_name
+    if mode == 'root':
+        root = directory + divider + down_dir
+        if not os.path.exists(root):
+            os.mkdir(root)
+        return root
+
     if os.path.exists(directory + divider + file_dir):
         return True
     else:

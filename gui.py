@@ -7,7 +7,7 @@
 # Imports
 import PySimpleGUI as sg
 import config as cfg
-import webauto as web
+import setup
 
 # Usage 'import gui'
 # Examples
@@ -274,7 +274,8 @@ layout = [
                                     # select_mode=sg.TABLE_SELECT_MODE_EXTENDED,
                                     col_widths=cfg.get_addresses('column'),
                                     num_rows=cfg.get_addresses('length'),
-                                    key='-TBL_ADDRESSES-'
+                                    key='-TBL_ADDRESSES-',
+                                    # vertical_scroll_only=False
                                     # min(25, len(cfg.get_addresses('value')))
                                 )
                              ],
@@ -307,7 +308,7 @@ layout = [
                                 ),
 
                                 sg.InputText(
-                                    'S123456',
+                                    '123456',
                                     size=(20, 1),
                                     key='-IN_BAN-'
                                 ),
@@ -328,7 +329,8 @@ layout = [
                                     justification='center',
                                     col_widths=cfg.get_aip('column'),
                                     num_rows=cfg.get_aip('length'),
-                                    key='-TBL_AIPS-'
+                                    key='-TBL_AIPS-',
+                                    # vertical_scroll_only=False
                                     # min(25, len(cfg.get_aip('value')))
                                 )
                             ],
@@ -371,7 +373,8 @@ layout = [
                                     justification='center',
                                     col_widths=cfg.get_spcr('column'),
                                     num_rows=cfg.get_spcr('length'),
-                                    key='-TBL_QUOTELINES-'
+                                    key='-TBL_QUOTELINES-',
+                                    # vertical_scroll_only=False
                                     # min(25, len(cfg.get_aip('value')))
                                 )
                             ],
@@ -400,24 +403,24 @@ layout = [
                 ],
 
                 # Console
-                [
-                    sg.Frame(
-                        'Console',
-                        layout=[
-
-                            # Console Element
-                            [
-                                sg.Output(
-                                    size=(155, 10),
-                                    key='-OUT_CONSOLE-'
-                                )
-                            ]
-                        ],
-                        element_justification='center',
-                        title_location=sg.TITLE_LOCATION_TOP,
-                        font=('', 15)
-                    )
-                ]
+                # [
+                #     sg.Frame(
+                #         'Console',
+                #         layout=[
+                #
+                #             # Console Element
+                #             [
+                #                 sg.Output(
+                #                     size=(155, 5),
+                #                     key='-OUT_CONSOLE-'
+                #                 )
+                #             ]
+                #         ],
+                #         element_justification='center',
+                #         title_location=sg.TITLE_LOCATION_TOP,
+                #         font=('', 15)
+                #     )
+                # ]
 
             ],
             element_justification='center',
@@ -453,16 +456,16 @@ while True:
         test = cfg.se_approve(values['-IN_OPP-'], values['-IN_QUOTE-'])
         print(test)
     if event == '-BTN_SETTINGS-':
-        if not web.driver_setup() or settings_confirm:
-            if not web.driver_setup():
+        if not setup.driver_setup() or settings_confirm:
+            if not setup.driver_setup():
                 print("Chrome Web Driver appears to be missing, please wait...")
             print("Starting download of latest chrome driver")
-            print("OS identified as " + web.what_am_i())
-            web.latest_download()
+            print("OS identified as " + setup.what_am_i())
+            setup.latest_download()
             settings_confirm = False
             print("Setup complete")
             print("")
-        elif web.driver_setup():
+        elif setup.driver_setup():
             print("Chrome Web Driver appears to be present, you can update by clicking the 'Settings' button again")
             print("")
             settings_confirm = True
@@ -499,8 +502,13 @@ while True:
 
     # Import AIPs
     if event == '-BTN_BANSEARCH-':
-        ban = values['-IN_DSR-']
-        print("INSERT FUNCTION TO GET AIPs UNDER BAN " + ban + " AND ADD TO TABLE")
+        aips = cfg.get_aip(mode='prod', ban=values['-IN_BAN-'])
+
+        if aips == 'Invalid BAN':
+            print("Invalid BAN - Please correct")
+        else:
+            window['-TBL_AIPS-'].update(values=aips['value'])
+            print("Successfully got AIPs")
         print("")
     if event == '-BTN_AIPS-':
         selected_values = []

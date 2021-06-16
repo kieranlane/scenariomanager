@@ -1,11 +1,13 @@
 import pandas as pd
 import addresses as ad
-import webauto as web
+import setup
 import os
 import json
+import automation as at
+import process as pr
 
 
-def config_create(path):
+def config_create(path, directory):
     new_cfg = {
         'sf_username': '',
         'sf_password': '',
@@ -14,6 +16,9 @@ def config_create(path):
 
     cfg_json = json.dumps(new_cfg)
 
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+
     with open(path, 'w') as cfg_file:
         cfg_file.write(cfg_json)
         cfg_file.close()
@@ -21,14 +26,15 @@ def config_create(path):
 
 def config_file(config='path', mode='read', value=''):
 
-    divider = web.what_am_i('divider')
+    divider = setup.what_am_i('divider')
 
     cwd = os.getcwd()
     path = cwd + divider + 'cfg' + divider + 'config.cfg'
+    directory = cwd + divider + 'cfg'
 
     # If no configuration file, create one
     if not os.path.exists(path):
-        config_create(path)
+        config_create(path, directory)
 
     # Return configuration path
     if config == 'path':
@@ -64,7 +70,7 @@ def config_file(config='path', mode='read', value=''):
 
 def get_files(filetype):
 
-    divider = web.what_am_i('divider')
+    divider = setup.what_am_i('divider')
     cwd = os.getcwd()
 
     if filetype == 'theme':
@@ -87,31 +93,43 @@ def get_files(filetype):
         return 'ERROR'
 
 
-def get_aip(tabletype, mode='test'):
+def get_aip(tabletype='', mode='test', ban='641045'):
 
     if mode == 'test':
-        df = pd.read_csv(get_files('aip'), sep=',', engine='python', header=None)
-        header = df.iloc[0].tolist()
-        value = df[1:].values.tolist()
+        source = get_files('aip')
     elif mode == 'prod':
-        df = 1
-        header = 1
-        value = 1
+        cgi_file = at.bssapp(at.start_driver(), ban)
+        source = pr.aip_html(cgi_file)
+        if source == 'Invalid BAN':
+            return source
+
     else:
         print('Config.py - get_aip, no matching "mode"')
         return 'ERROR'
 
-    if tabletype == 'header':
-        return header
-    elif tabletype == 'value':
-        return value
-    elif tabletype == 'column':
-        return [6, 30]
-    elif tabletype == 'length':
-        return 25
+    df = pd.read_csv(source, sep=',', engine='python', header=None)
+    header = df.iloc[0].tolist()
+    value = df[1:].values.tolist()
+
+    if mode == 'prod':
+        aips = {'header': header, 'value': value, 'column': [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                'length': 25}
+        return aips
+
     else:
-        print('Config.py - get_aip, no matching "tabletype"')
-        return 'ERROR'
+        if tabletype == 'header':
+            return header
+        elif tabletype == 'value':
+            return value
+        elif tabletype == 'column':
+            if mode == 'test':
+                # return [6, 30]
+                return [8, 8, 20, 8, 8]
+        elif tabletype == 'length':
+            return 25
+        else:
+            print('Config.py - get_aip, no matching "tabletype"')
+            return 'ERROR'
 
 
 def get_addresses(tabletype, mode='initial', filters='', dataframe=''):
