@@ -10,10 +10,6 @@
 #       wa.latest_download()
 #       wa.latest_download(alt_dir)
 
-# Mac Changes
-# Replace https with http
-# Change backslashes
-
 # SCRIPT START
 import os
 import requests
